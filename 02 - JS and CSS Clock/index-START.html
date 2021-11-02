@@ -1,0 +1,128 @@
+<!--
+ * Description:
+ * Author:LinJ
+ * Date:2021-11-02 23:17:58
+ * LastEditors:LinJ
+ * LastEditTime:2021-11-03 00:33:32
+-->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>JS + CSS Clock</title>
+		<style>
+    html {
+      background: #018DED url(https://unsplash.it/1500/1000?image=881&blur=5);
+      background-size: cover;
+      font-family: 'helvetica neue';
+      text-align: center;
+      font-size: 10px;
+    }
+
+    body {
+      margin: 0;
+      font-size: 2rem;
+      display: flex;
+      flex: 1;
+      min-height: 100vh;
+      align-items: center;
+    }
+
+    .clock {
+      width: 30rem;
+      height: 30rem;
+      border: 20px solid white;
+      border-radius: 50%;
+      margin: 50px auto;
+      position: relative;
+      padding: 2rem;
+      box-shadow:
+        0 0 0 4px rgba(0,0,0,0.1),
+        inset 0 0 0 3px #EFEFEF,
+        inset 0 0 10px black,
+        0 0 10px rgba(0,0,0,0.2);
+    }
+
+    .clock-face {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transform: translateY(-3px); /* account for the height of the clock hands */
+    }
+
+    .hand {
+      width: 50%;
+      height: 6px;
+      background: black;
+      position: absolute;
+      top: 50%;
+      /* 调整指针的初始位置以及旋转的轴点 */
+      transform-origin: 100%;
+      transform: rotate(90deg);
+    }
+    .transition{
+      transition: all 0.05s;
+      transition-timing-function: cubic-bezier(0.1, 2.7, 0.58, 1);
+    }
+		</style>
+	</head>
+	<body>
+		<div class="clock">
+			<div class="clock-face">
+				<div class="hand hour-hand transition"></div>
+				<div class="hand min-hand transition"></div>
+				<div class="hand second-hand transition"></div>
+			</div>
+		</div>
+
+		<script>
+      const hourHand = document.querySelector('.hour-hand'),
+            minHand = document.querySelector('.clock-face .min-hand'),
+            secondHand = document.querySelector('.clock-face .second-hand');
+
+      // 根据现在的时间设置时钟
+      const setTime = ()=>{
+        const now = new Date();
+
+        const hour = now.getHours();
+        const min = now.getMinutes();
+        const second = now.getSeconds();
+
+        // 除了整体角度，时-分，分-秒之间还有小角度
+        const hourHandDegree = hour * (360/12) + ((min/60)*30) + 90;
+        const minHandDegree = min * (360/60) + ((second/60)*6) + 90;
+        const secondHandDegree = second * (360/60) + 90;
+        
+        // 分针和秒针从59->0时由于角度变化太大，会动画发生问题所以单独取出做处理
+        if(secondHandDegree === 90) {
+          // 先把动画效果取消
+          secondHand.classList.remove('transition')
+          // 将当前角度设置为90-6 = 84deg
+          secondHand.style.transform = `rotate(84deg)`;
+          setTimeout(()=>{
+            // 异步恢复动画效果
+            secondHand.classList.add('transition');
+          },0);
+        }
+        if(minHandDegree === 90) {
+          // 先把动画效果取消
+          minHand.classList.remove('transition')
+          // 将当前角度设置为 90-6 = 84deg
+          minHand.style.transform = `rotate(84deg)`;
+          setTimeout(()=>{
+            // 异步恢复动画效果
+            minHand.classList.add('transition');
+          },0);
+        }
+        hourHand.style.transform = `rotate(${hourHandDegree}deg)`;
+        minHand.style.transform = `rotate(${minHandDegree}deg)`;
+        secondHand.style.transform = `rotate(${secondHandDegree}deg)`;
+      }
+
+      // 定时更新
+      setInterval(setTime,1000);
+      // 初始化
+      setTime()
+    </script>
+	</body>
+</html>
