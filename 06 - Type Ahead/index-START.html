@@ -3,7 +3,7 @@
  * Author:LinJ
  * Date:2021-11-05 00:46:18
  * LastEditors:LinJ
- * LastEditTime:2021-11-05 15:36:27
+ * LastEditTime:2021-11-05 16:15:27
 -->
 <!DOCTYPE html>
 <html lang="en">
@@ -30,6 +30,15 @@ async function getJson(url) {
   const response = await fetch(url);
   return await response.json();
 }
+function debounce (f, wait) {
+  let timer
+  return (...args) => {
+    clearTimeout(timer)
+    timer = setTimeout(() => {
+      f(...args)
+    }, wait)
+  }
+}
 // 检索诗词，筛选出符合条件的诗词并返回
 function searchSongs (inputValue) {
   // 筛选诗词
@@ -54,11 +63,17 @@ function renderList(matchList, highLishtStr){
   // 渲染
   ul.innerHTML = html;
 }
+// 防抖，每次结束输入后500ms内如果没有继续触发则执行操作
+const inputChangeHandle = debounce(function (value){
+  let matchedList = searchSongs(value);
+  renderList(matchedList, value);
+}, 500);
 
-function inputChangeHandle(e) {
-  let matchedList = searchSongs(this.value);
-  renderList(matchedList, this.value);
-}
+// function inputChangeHandle(e) {
+//   let matchedList = searchSongs(this.value);
+//   renderList(matchedList, this.value);
+// }
+
 // 获取json数据并解析
 getJson(endpoint)
   .then(data => {
@@ -75,7 +90,9 @@ getJson(endpoint)
     ul.innerHTML = `<li>解析完毕，可以开始检索</li>`
   })
 // bind event
-input.addEventListener('input',inputChangeHandle)
+input.addEventListener('input',function (){
+  inputChangeHandle(this.value);
+})
 </script>
 </body>
 </html>
