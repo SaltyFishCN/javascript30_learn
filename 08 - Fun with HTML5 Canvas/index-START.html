@@ -1,0 +1,88 @@
+<!--
+ * Description:
+ * Author:LinJ
+ * Date:2021-11-05 16:27:37
+ * LastEditors:LinJ
+ * LastEditTime:2021-11-05 17:45:18
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>HTML5 Canvas</title>
+</head>
+<body>
+<canvas id="draw" width="800" height="800"></canvas>
+<script>
+  const canvasDraw = document.querySelector('#draw');
+  // 获取上下文
+  const ctx = canvasDraw.getContext('2d');
+  // 画板大小设置为可视窗大小
+  canvasDraw.width = window.innerWidth;
+  canvasDraw.height = window.innerHeight;
+  // 设置画笔
+  ctx.strokeStyle = '#BADA55';  // 画笔颜色
+  // 连接处与线条末端都设置为圆形
+  ctx.lineJoin = 'round'; 
+  ctx.lineCap = 'round';
+  // 画笔粗细
+  ctx.lineWidth = 50;
+
+  let isDrawing = false;
+  let lastX = 0;
+  let lastY = 0;
+  let hue = 0;
+  let direction = true;
+  
+  function drawhandle(e) {
+    if(!isDrawing) return;
+    // 描述画笔（绘制图形）颜色或者样式的属性
+    ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`;
+    // 开启新路径
+    ctx.beginPath();
+    // 终点
+    ctx.moveTo(lastX, lastY);
+    // 连接至起点
+    ctx.lineTo(e.offsetX, e.offsetY);
+    // 绘制
+    ctx.stroke();
+    // 更新起点
+    [lastX, lastY] = [e.offsetX, e.offsetY];
+    // 颜色变更
+    hue++;
+    if (hue >= 360) {
+      hue = 0;
+    }
+
+    // 画笔粗细变更
+    if (ctx.lineWidth >= 100 || ctx.lineWidth <= 1) {
+      direction = !direction;
+    }
+
+    if(direction) {
+      ctx.lineWidth++;
+    } else {
+      ctx.lineWidth--;
+    }
+  }
+  // 落下时开始绘画
+  canvasDraw.addEventListener('mousedown',(e)=>{
+    isDrawing = true;
+    // 设置起始点坐标
+    [lastX, lastY] = [e.offsetX, e.offsetY]
+  })
+  // 移动时绘制
+  canvasDraw.addEventListener('mousemove',drawhandle)
+  // 抬起、移出画板时停止绘画
+  canvasDraw.addEventListener('mouseup',()=>{ isDrawing = false });
+  canvasDraw.addEventListener('mouseout',()=>{ isDrawing = false });
+</script>
+
+<style>
+  html, body {
+    margin: 0;
+  }
+</style>
+
+</body>
+</html>
