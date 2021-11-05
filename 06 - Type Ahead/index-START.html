@@ -1,0 +1,81 @@
+<!--
+ * Description:
+ * Author:LinJ
+ * Date:2021-11-05 00:46:18
+ * LastEditors:LinJ
+ * LastEditTime:2021-11-05 15:36:27
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Type Ahead 👀</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <form class="search-form">
+    <input type="text" class="search" placeholder="输入诗句、诗词或诗人">
+    <ul class="suggestions">
+      <li>连接诗词库中....</li>
+    </ul>
+  </form>
+<script>
+const endpoint = 'https://gist.githubusercontent.com/soyaine/81399bb2b24ca1bb5313e1985533c640/raw/bdf7df2cbcf70706c4a5e51a7dfb8c933ed78878/TangPoetry.json';
+let songList = [];
+const input = document.querySelector('.search'),
+      ul = document.querySelector('.suggestions');
+
+async function getJson(url) {
+  const response = await fetch(url);
+  return await response.json();
+}
+// 检索诗词，筛选出符合条件的诗词并返回
+function searchSongs (inputValue) {
+  // 筛选诗词
+  return songList.filter(song=>{
+    return song.title.includes(inputValue) ||
+    song.detail_author.includes(inputValue) ||
+    song.detail_text.includes(inputValue);
+  })
+}
+
+// 对传入的诗词组进行解析并渲染
+function renderList(matchList, highLishtStr){
+  // 对诗词进行处理
+  let html = matchList.map(song => {
+    let text = `<li><p>${song.detail_text}————《${song.title}》${song.detail_author}<p></li>`;
+    if(highLishtStr){
+      // 高亮显示
+      text = text.replace(new RegExp(highLishtStr, 'gi'),`<span class="hl">${highLishtStr}</span>`)
+    }
+    return text;
+  }).join('');
+  // 渲染
+  ul.innerHTML = html;
+}
+
+function inputChangeHandle(e) {
+  let matchedList = searchSongs(this.value);
+  renderList(matchedList, this.value);
+}
+// 获取json数据并解析
+getJson(endpoint)
+  .then(data => {
+    songList.push(...data);
+    // 解析数据，将标题，作者和内容单独取出
+    songList = songList.map(({title, detail_author, detail_text})=>{
+      return { 
+        title,
+        detail_author: detail_author.join(','),
+        detail_text 
+      }
+    });
+    console.log('analyze completed')
+    ul.innerHTML = `<li>解析完毕，可以开始检索</li>`
+  })
+// bind event
+input.addEventListener('input',inputChangeHandle)
+</script>
+</body>
+</html>
