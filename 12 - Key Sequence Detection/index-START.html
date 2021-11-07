@@ -1,0 +1,37 @@
+<!--
+ * Description:
+ * Author:LinJ
+ * Date:2021-11-07 13:41:24
+ * LastEditors:LinJ
+ * LastEditTime:2021-11-07 14:00:57
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Key Detection</title>
+  <script type="text/javascript" src="https://www.cornify.com/js/cornify.js"></script>
+</head>
+<body>
+<script>
+  // 已经输入的内容
+  let inputed = [];
+  // 暗号
+  const secret = "hello"
+  // 按键抬起时触发
+  window.addEventListener('keyup', function(e){
+    // console.log(e.key);
+    inputed.push(e.key);
+    // 已输入的长度如果大于暗号长度，则进行裁剪
+    inputed.splice(0, inputed.length - secret.length)
+    
+    if(inputed.join('').includes(secret)){
+      console.log('congratulate');
+      cornify_add();
+      // 清空数据
+      inputed.splice(0);
+    }
+  })
+</script>
+</body>
+</html>
