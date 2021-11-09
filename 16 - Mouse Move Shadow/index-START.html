@@ -1,0 +1,84 @@
+<!--
+ * Description:
+ * Author:LinJ
+ * Date:2021-11-09 16:49:03
+ * LastEditors:LinJ
+ * LastEditTime:2021-11-09 17:38:50
+-->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Mouse Shadow</title>
+		<style>
+			html {
+				color: black;
+				font-family: sans-serif;
+			}
+
+			body {
+				margin: 0;
+			}
+
+			.hero {
+				min-height: 100vh;
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				color: black;
+			}
+
+			h1 {
+				text-shadow: 10px 10px 0 rgba(0, 0, 0, 1);
+				font-size: 100px;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="hero">
+			<h1 contenteditable>🔥WOAH!</h1>
+		</div>
+
+		<script>
+      const hero = document.querySelector('.hero');
+      const text = hero.querySelector('h1');
+      // 获取hero的宽高
+      const { offsetWidth: width,offsetHeight: height } = hero;
+      function throttle(func, wait = 20) {
+        let timer;
+        return function(...args){
+          if(timer){
+            return;
+          }
+          timer = setTimeout(() => {
+            func.call(this, ...args);
+            timer = null;
+          }, wait)
+        }
+      }
+
+      function shadowMove(e) {
+        // 取出事件对象相对于目标对象(hero)左上角的坐标
+        let { offsetX: x, offsetY: y } = e;
+
+        if (this !== e.target) {
+          // 在text内移动时，需要加上text对应的离左边与顶部的距离
+          x = x + e.target.offsetLeft;
+          y = y + e.target.offsetTop;
+        }
+        // 求出当前鼠标到text中心的距离
+        const xWalk = Math.round((text.offsetLeft + text.offsetWidth / 2 ) - x) * 0.4;
+        const yWalk = Math.round((text.offsetTop + text.offsetHeight / 2 ) - y) * 0.4;
+
+        // 针对textShadow 进行修改
+        text.style.textShadow = `
+          ${xWalk}px ${yWalk}px 0 rgba(255,0,255,0.7),
+          ${xWalk * -1}px ${yWalk}px 0 rgba(0,255,255,0.7),
+          ${yWalk}px ${xWalk * -1}px 0 rgba(0,255,0,0.7),
+          ${yWalk * -1}px ${xWalk}px 0 rgba(0,0,255,0.7)
+        `;
+      }
+      hero.addEventListener("mousemove", throttle(shadowMove, 20));
+    </script>
+	</body>
+</html>
