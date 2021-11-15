@@ -1,0 +1,95 @@
+<!--
+ * Description:
+ * Author:LinJ
+ * Date:2021-11-15 16:41:01
+ * LastEditors:LinJ
+ * LastEditTime:2021-11-15 23:02:16
+-->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Speech Synthesis</title>
+		<link
+			href="https://fonts.googleapis.com/css?family=Pacifico"
+			rel="stylesheet"
+			type="text/css"
+		/>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<div class="voiceinator">
+			<h1>The Voiceinator 5000</h1>
+
+			<select name="voice" id="voices">
+				<option value="" disabled selected>Select A Voice</option>
+			</select>
+
+			<label for="rate">Rate:</label>
+			<input
+				name="rate"
+				type="range"
+				min="0"
+				max="3"
+				value="1"
+				step="0.1"
+			/>
+
+			<label for="pitch">Pitch:</label>
+
+			<input name="pitch" type="range" min="0" max="2" step="0.1" />
+			<textarea name="text">Hello! I love JavaScript 👍</textarea>
+			<button id="stop">Stop!</button>
+			<button id="speak">Speak</button>
+		</div>
+
+		<script>
+      //  网页语音 API 的SpeechSynthesis 接口是语音服务的控制接口；
+      // 它可以用于获取设备上关于可用的合成声音的信息，开始、暂停语音，或除此之外的其他命令。
+
+			const msg = new SpeechSynthesisUtterance();
+			let voices = [];
+			const voicesDropdown = document.querySelector('[name="voice"]');
+			const options = document.querySelectorAll(
+				'[type="range"], [name="text"]'
+			);
+			const speakButton = document.querySelector("#speak");
+			const stopButton = document.querySelector("#stop");
+
+      function voiceChange (e) {
+        msg.voice = voices.find(voice => voice.name === this.value);
+        toggle();
+      }
+
+      function toggle( startOver = true ) {
+        // 移除所有语音谈话队列中的谈话。
+        speechSynthesis.cancel();
+        if (startOver) {
+          // 添加一个 utterance 到语音谈话队列；它将会在其他语音谈话播放完之后播放。
+          speechSynthesis.speak(msg);
+        }
+      }
+      function setOption(e) {
+        msg[this.name] = this.value;
+        toggle();
+      }
+      // 当由SpeechSynthesis.getVoices()方法返回的SpeechSynthesisVoice (en-US)列表改变时触发。
+      speechSynthesis.onvoiceschanged = function () {
+        voices = this.getVoices();
+        voicesDropdown.innerHTML += voices
+          .filter((voice) =>{
+            return voice.lang === 'zh-CN';
+          })
+          .map((voice) => {
+          return `<option>${voice.name}</option>`;
+        }).join('');
+      }
+      
+      voicesDropdown.addEventListener('change', voiceChange);
+      speakButton.addEventListener('click', toggle);
+      stopButton.addEventListener('click', () => toggle(false));
+      // 设置参数
+      options.forEach(option => option.addEventListener('change', setOption));
+		</script>
+	</body>
+</html>
