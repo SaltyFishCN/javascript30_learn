@@ -1,0 +1,82 @@
+<!--
+ * Description:
+ * Author:LinJ
+ * Date:2021-11-16 17:18:50
+ * LastEditors:LinJ
+ * LastEditTime:2021-11-16 17:18:50
+-->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Understanding JavaScript's Capture</title>
+	</head>
+	<body class="bod">
+		<div class="one">
+			<div class="two">
+				<div class="three"></div>
+			</div>
+		</div>
+
+		<style>
+			html {
+				box-sizing: border-box;
+			}
+
+			*,
+			*:before,
+			*:after {
+				box-sizing: inherit;
+			}
+
+			div {
+				width: 100%;
+				padding: 100px;
+			}
+
+			.one {
+				background: thistle;
+			}
+
+			.two {
+				background: mistyrose;
+			}
+
+			.three {
+				background: coral;
+			}
+		</style>
+
+		<button></button>
+		<script>
+			const divs = document.querySelectorAll("div");
+			const button = document.querySelector("button");
+
+			function logText(e) {
+				console.log(this.classList.value);
+				// e.stopPropagation(); // stop bubbling!
+				// console.log(this);
+			}
+
+			divs.forEach((div) =>
+				div.addEventListener("click", logText, {
+					// capture:  Boolean，表示 listener 会在该类型的事件捕获阶段传播到该 EventTarget 时触发。
+					capture: false,
+					// once:  Boolean，表示 listener 在添加之后最多只调用一次。
+					// 如果是 true， listener 会在其被调用之后自动移除
+					once: true,
+				})
+			);
+
+			button.addEventListener(
+				"click",
+				() => {
+					console.log("Click!!!");
+				},
+				{
+					once: true,
+				}
+			);
+		</script>
+	</body>
+</html>
