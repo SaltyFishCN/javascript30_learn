@@ -1,0 +1,65 @@
+<!--
+ * Description:
+ * Author:LinJ
+ * Date:2021-11-17 17:35:01
+ * LastEditors:LinJ
+ * LastEditTime:2021-11-17 20:39:29
+-->
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Video Speed Scrubber</title>
+		<link rel="stylesheet" href="style.css" />
+	</head>
+	<body>
+		<div class="wrapper">
+			<video
+				class="flex"
+				width="765"
+				height="430"
+				src="http://clips.vorwaerts-gmbh.de/VfE_html5.mp4"
+				loop
+				controls
+			></video>
+			<div class="speed">
+				<div class="speed-bar">1×</div>
+			</div>
+		</div>
+
+		<script>
+      const video = document.querySelector('.flex');
+      const speed = document.querySelector('.speed');
+      const sppedOffsetTop = speed.offsetTop;
+      const speedBar = speed.querySelector('.speed-bar');
+      const MAX_PLAY_RATE = 5.0;
+
+      let startY = 0;
+      let height = 0;
+      let isDown = false;
+
+      function handleDown(e) {
+        isDown = true;
+        startY = e.pageY - sppedOffsetTop;
+        height = parseFloat(getComputedStyle(speedBar, false)['height']);
+      }
+
+      function handleMove(e) {
+        if (!isDown) return;
+        const y = e.pageY - sppedOffsetTop - startY;
+        let percent = (height + y) *100 / speed.offsetHeight;
+        percent = percent > 100 ? 100 : (percent < 5 ? 5 : percent);
+        speedBar.style.height = `${percent}%`;
+        let playbackRate = percent/100 * MAX_PLAY_RATE
+        speedBar.innerText = `${Math.round(playbackRate*100)/100}x`;
+        video.playbackRate = playbackRate;
+      }
+
+      speed.addEventListener('mousedown', handleDown);
+      speed.addEventListener('mouseup', ()=>{ isDown = false });
+      speed.addEventListener('mouseleave', ()=>{ isDown = false });
+      speed.addEventListener('mousemove', handleMove);
+      
+    </script>
+	</body>
+</html>
