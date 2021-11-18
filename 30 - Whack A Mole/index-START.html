@@ -1,0 +1,121 @@
+<!--
+ * Description:
+ * Author:LinJ
+ * Date:2021-11-18 17:17:54
+ * LastEditors:LinJ
+ * LastEditTime:2021-11-18 20:55:21
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Whack A Mole!</title>
+  <link href='https://fonts.googleapis.com/css?family=Amatic+SC:400,700' rel='stylesheet' type='text/css'>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Whack-a-mole! <span class="score">0</span></h1>
+  <button id="startBtn" onClick="toggleGame()">Start!</button>
+
+  <div class="game">
+    <div class="hole hole1">
+      <div class="mole"></div>
+    </div>
+    <div class="hole hole2">
+      <div class="mole"></div>
+    </div>
+    <div class="hole hole3">
+      <div class="mole"></div>
+    </div>
+    <div class="hole hole4">
+      <div class="mole"></div>
+    </div>
+    <div class="hole hole5">
+      <div class="mole"></div>
+    </div>
+    <div class="hole hole6">
+      <div class="mole"></div>
+    </div>
+  </div>
+
+<script>
+  // 洞
+  const holes = document.querySelectorAll('.hole');
+  // 计分板
+  const scoreBoard = document.querySelector('.score');
+  // 地鼠
+  const moles = document.querySelectorAll('.mole');
+
+  let isPlaying = false;
+  let gameTimer = null;
+  let istimeUp = false;
+  let score = 0;
+  let lastHole;
+
+  function toggleGame() {
+    if(isPlaying) {
+      // 正在游玩，点击重置游戏
+      document.querySelector('#startBtn').textContent = 'Start !';
+      clearTimeout(gameTimer);
+      istimeUp = false;
+    } else {
+      console.log('game start');
+      // 未游玩，点击开始
+      document.querySelector('#startBtn').textContent = 'Pause !';
+      // 启动第一个
+      peep();
+      gameTimer = setTimeout(()=>{istimeUp = true;}, 10000)
+    }
+
+    isPlaying = !isPlaying;
+    score = 0;
+    scoreBoard.textContent = 0;
+  }
+
+  // 随机时间，单位为 ms
+  function randomTime(min, max) {
+    return Math.round(Math.random() * (max - min) + min);
+  }
+
+  // 随机地洞
+  function randomHole(holes) {
+    // 0 - (length - 1)
+    const idx = Math.floor(Math.random() * holes.length);
+    const hole = holes[idx];
+
+    // 与上一次的一致
+    if(hole === lastHole) {
+      return randomHole(holes);
+    }
+    lastHole = hole;
+    return hole;
+  } 
+
+  // 游戏主程序，随机出现地鼠
+  function peep() {
+    console.log('peep');
+    // 随机出现的时长
+    const randomDuration = randomTime(200, 1500);
+    // 随机出现的位置
+    const hole = randomHole(holes);
+
+    hole.classList.add('up');
+    setTimeout(()=>{
+      hole.classList.remove('up');
+      // 递归调用，继续下一只
+      if(!istimeUp) peep();
+    }, randomDuration)
+  }
+
+  // 击中地鼠
+  function bonk() {
+    score ++;
+    this.parentNode.classList.remove('up');
+    scoreBoard.textContent = scrore;
+  }
+  
+  moles.forEach(mole=>{mole.addEventListener('click', bonk)});
+</script>
+</body>
+</html>
